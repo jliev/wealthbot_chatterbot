@@ -19,7 +19,7 @@ class ChatConsumer(WebsocketConsumer):
 #       3.update the user profile by the message: Li Jiahao
 #       wealthbot_callback(message)
 
-        response = message
+        response = message + "chatterbot not inplement yet"
         self.send(text_data=json.dumps({
             'message': response
         }))
