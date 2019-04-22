@@ -1,0 +1,7 @@
+----help----
+for adding channels:
+
+1. in wealthbot/settings.py
+   a) add ASGI_APPLICATION = 'mysite.routing.application' to the bottom
+   b) add "chat","channel" to INSTALLED_APPS
+

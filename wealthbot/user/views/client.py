@@ -67,6 +67,7 @@ def registration(request, ria_id):
 			# Authenticate and login the newly created user
 			username = form.cleaned_data.get('email')
 			user = authenticate(username=username, password=password)
+			# that is when we have an actual user
 			login(request, user)
 			return redirect('rx_client_profile_step_one')
 	else:

@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'chat',
     'user.apps.UserConfig',
     'client.apps.ClientConfig',
     'admin.apps.AdminConfig',
@@ -143,3 +145,5 @@ LOGIN_URL = 'fos_user_security_login'
 
 # Config session to save key value for every request
 SESSION_SAVE_EVERY_REQUEST = True
+
+ASGI_APPLICATION = 'wealthbot.routing.application'
