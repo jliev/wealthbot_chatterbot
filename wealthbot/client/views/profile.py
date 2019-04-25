@@ -16,7 +16,6 @@ ACCOUNT_STEP_ACCOUNT_GROUP = 1
 ACCOUNT_STEP_ACCOUNT_GROUP_TYPE = 2
 ACCOUNT_STEP_ACCOUNT_UPDATE_FORM = 3
 ACCOUNT_STEP_ACCOUNT_OWNER_FORM = 4
-
 @login_required
 def stepOne(request):
 	# Get the user object
@@ -28,8 +27,10 @@ def stepOne(request):
 	else:
 		profile = user.profile
 
+
 	# Create user profile collection form
 	if request.method == 'POST':
+		print('stepOne: ',request.POST)
 		form = ClientProfileForm(request.POST, prefix='client', instance=profile)
 		subform = ClientSpouseForm(request.POST, prefix='spouse')
 		if form.is_valid():
@@ -80,7 +81,7 @@ def stepOne(request):
 			print(form.non_field_errors)
 	else:
 		form = ClientProfileForm(
-			prefix='client', 
+			prefix='client',
 			instance=profile,
 		)
 		subform = ClientSpouseForm(prefix='spouse')
@@ -92,6 +93,7 @@ def stepOne(request):
 	}
 	return render(request, 'client/profile_step_one.html', context)
 
+
 @login_required
 def stepTwo(request):
 	# Get the user object
@@ -102,6 +104,7 @@ def stepTwo(request):
 		raise Http404("Ria user does not exist.")
 
 	if request.method == 'POST':
+		print('stepTwo: ',request.POST)
 		form = ClientQuestionsForm(request.POST, user=user)
 		if form.is_valid():
 			# Pre-process by removing all previous userAnswer records
@@ -179,6 +182,7 @@ def stepThree(request):
 	user = request.user
 
 	if request.method == 'POST':
+		print("stepThree: ", request.POST)
 		form = AccountGroupsForm(request.POST, user=user)
 		if form.is_valid():
 			group = form.cleaned_data['groups']
@@ -243,6 +247,7 @@ def createAccount(request, group):
 		###############
 		# Pre-process form data before validation
 		###############
+		print("createAccount: ",request.POST)
 		post = request.POST.copy()
 		post['value'] = float(post['value'].replace(',',''))
 		post['groupType'] = groupType.pk
@@ -303,7 +308,7 @@ def createAccount(request, group):
 def updateAccountForm(request, group):
 	# Get the user object
 	client = request.user
-
+	print('updateAccountForm',request.POST)
 	form = ClientAccountForm(request.POST, user=client, group=group, validateAdditionalFields=False)
 
 	step = getAccountStep(session=request.session)
@@ -548,7 +553,7 @@ def showDepositAccountForm(request):
 	# Get the user object
 	client = request.user
 	group = getAccountGroup(request.session)
-
+	print("showDepositAccountForm: ",request.POST)
 	depositAccountGroupForm = AccountTypesForm(request.POST, user=client, group=group)
 
 	if depositAccountGroupForm.is_valid():

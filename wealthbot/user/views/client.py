@@ -9,9 +9,11 @@ from user.models import User, Profile
 from client.models import ClientSettings
 from admin.models import BillingSpec
 from user.forms import ClientRegistrationForm
+#import json
 
 def registration(request, ria_id):
 	# If the user already logged-in,, then redirect to page to continue registration
+
 	if request.user.is_authenticated:
 		redirectUrl = redirectIfUserExist(request.user)
 		if redirectUrl is not None:
@@ -28,6 +30,7 @@ def registration(request, ria_id):
 
 	# Create the registration form
 	if request.method == 'POST':
+		print("post message:-------look at me-------------", request.POST)
 		form = ClientRegistrationForm(request.POST)
 		if form.is_valid():
 			form.instance.username = form.cleaned_data['email']
