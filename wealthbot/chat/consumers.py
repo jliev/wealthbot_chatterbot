@@ -1,8 +1,10 @@
 # chat/consumers.py
 from channels.generic.websocket import WebsocketConsumer
 from .wealthbot_function.client import registration0
-from .wealthbot_function.profile import registration1,registration2,registration3,registration4,registration5,registration6
+from .wealthbot_function.profile import registration1,registration2,registration3
+from .wealthbot_function.profile import registration4,registration5,registration6
 import json
+import re
 
 class obj(object):
     def __init__(self, d):
@@ -29,13 +31,10 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-#       1.the connection has been built: Xinyu (finished)
-#       2.get response from message to the user interface : Niu Hongqian and Liu xian
-#       response = chatterbot.get_response(message)
-#       3.update the user profile by the message: Li Jiahao
+        response,ex_msg = self.wealthbot.get_response(message)
+        if ex_msg != None:
+            message = ex_msg
         self.wealthbot.recv_msg(self.scope,message)
-
-        response = message + " " + "(chatterbot not implement yet)"
         self.send(text_data=json.dumps({
             'message': response
         }))
@@ -74,12 +73,16 @@ class wealthbot_chat:
         self.function5 = registration5
         self.function6 = registration6
 
+        self.name = ""
 
     def recv_msg(self, request, message):
         # initial registration step
         print(message)
         if self.registration_step == 0:
-            field = self.field0[self.step]
+            if self.step == 0:
+                self.step += 1
+                return
+            field = self.field0[self.step-1]
             self.post0[field] = message
             self.step += 1
             print('--------post0-------:', self.post0)
@@ -183,4 +186,27 @@ class wealthbot_chat:
             self.function6(request)
             return
 
+    def get_response(self,message):
 
+        ex_msg= None
+        response = None
+
+        if self.registration_step == 0:
+            if self.step == 0:
+                if message == "login":
+                    response = "What is your name"
+                else:
+                    response = "if you want to start, send login"
+                    self.step -= 1
+            elif self.step == 1:
+                results = re.findall("My name is \w*",message)
+                result  = results[0]
+                ex_msg  = result.replace("My name is ","")
+                self.name = ex_msg
+                response  = f"{self.name},what's your email"
+            else:
+                response = "None"
+        else:
+            response = "None"
+
+        return response,ex_msg
