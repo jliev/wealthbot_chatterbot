@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/django-wealthbot.iml" filepath="$PROJECT_DIR$/.idea/django-wealthbot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/wealthbot_chatterbot.iml" filepath="$PROJECT_DIR$/.idea/wealthbot_chatterbot.iml" />
     </modules>
   </component>
 </project>

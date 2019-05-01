@@ -1,6 +1,6 @@
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate,login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
@@ -9,7 +9,7 @@ from user.models import User, Profile
 from client.models import ClientSettings
 from admin.models import BillingSpec
 from user.forms import ClientRegistrationForm
-from channels.auth import login
+#from channels.auth import login
 #import json
 
 def registration0(request, ria_id):
@@ -63,9 +63,14 @@ def registration0(request, ria_id):
 		clientSettings.save()
 		# Authenticate and login the newly created user
 		username = form.cleaned_data.get('email')
-		user = authenticate(username=username, password=password)
+		request.session.save()
+		user = authenticate(request, username=username, password=password)
+
 		# that is when we have an actual user
+
 		login(request, user)
+
+
 		print("the initial step is ok")
 
 	pass

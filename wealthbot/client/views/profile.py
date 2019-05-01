@@ -335,7 +335,7 @@ def stepThreeBack(request):
 def completeStepThree(request):
 	# Get the user object
 	client = request.user
-
+	print("---------look at me---------",request.user)
 	# Set Client registration step to 3
 	profile = client.profile
 	profile.registration_step = 3

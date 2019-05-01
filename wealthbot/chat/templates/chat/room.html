@@ -12,6 +12,8 @@
     <p>To start the conversation, please send:   <b>login</b></p>
     <a class="btn btn-default"  id="see_result"
        href="{% url 'rx_client_profile_step_three_complete' %}">See My Portfolio</a>
+    <input id="room-name-result" type="button" value="Enter"/>
+
 </body>
 
 <script>
@@ -47,5 +49,9 @@
 
         messageInputDom.value = '';
     };
+
+    document.querySelector('#room-name-result').onclick = function(e) {
+    window.location.pathname = 'apple/portfolio' ;
+        };
 </script>
 </html>

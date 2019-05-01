@@ -3,14 +3,16 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import loader
 from django.urls import reverse
-from client.forms import ClientProfileForm, ClientSpouseForm, ClientQuestionsForm
+from client.forms import ClientProfileForm, ClientSpouseForm, ClientQuestionsForm,PortfolioForm
 from client.forms import AccountGroupsForm, AccountTypesForm, ClientAccountForm, TypedClientAccountForm
 from user.models import Profile
 from client.models import ClientQuestionnaireAnswer, AccountGroup, AccountType
-from client.models import AccountGroupType, ClientAccount, SystemAccount
+from client.models import AccountGroupType, ClientAccount, SystemAccount, AccountGroup
 from ria.models import RiskQuestion, RiskAnswer
 from client.managers.riskToleranceManager import RiskToleranceManager
 from client.managers.clientPortfolioManager import ClientPortfolioManager
+from datetime import datetime
+from client.managers.portfolioInformationManager import PortfolioInformationManager
 
 ACCOUNT_STEP_ACCOUNT_GROUP = 1
 ACCOUNT_STEP_ACCOUNT_GROUP_TYPE = 2
@@ -20,7 +22,7 @@ ACCOUNT_STEP_ACCOUNT_OWNER_FORM = 4
 def registration1(request):
 	# Get the user object
 	user = request.user
-
+	print("step1,user------",user)
 	# Create user profile if it doesn't exist
 	if not hasattr(user, 'profile'):
 		profile = Profile(user=user, first_name='#')
@@ -72,7 +74,7 @@ def registration1(request):
 def registration2(request):
 	# Get the user object
 	user = request.user
-
+	print("step2,user------", user)
 	# Check if user exists as client role or not
 	if (user is None) or (not user.hasRole('ROLE_CLIENT')):
 		raise Http404("Ria user does not exist.")
@@ -140,7 +142,7 @@ def registration3(request):
 
 	# Get the user object
 	user = request.user
-
+	print("step3,user------", user)
 
 	form = AccountGroupsForm(request.POST, user=user)
 	if form.is_valid():
@@ -169,6 +171,7 @@ def registration4(request):
 
 	# Get the user object
 	client = request.user
+	print("step4,user------", client)
 	group = getAccountGroup(request.session)
 	print("showDepositAccountForm: ",request.POST)
 	depositAccountGroupForm = AccountTypesForm(request.POST, user=client, group=group)
@@ -205,6 +208,7 @@ def registration4(request):
 def registration5(request):
 	# Get the user object
 	client = request.user
+	print("step5,user------", client)
 	group = getAccountGroup(request.session)
 	print('updateAccountForm',request.POST)
 	form = ClientAccountForm(request.POST, user=client, group=group, validateAdditionalFields=False)
@@ -233,6 +237,7 @@ def registration6(request):
 	group = getAccountGroup(request.session)
 	# Get the user object
 	client = request.user
+	print("step6,user------", client)
 	if (client is None) or (not client.hasRole('ROLE_CLIENT')):
 		return JsonResponse(
 			{
@@ -316,6 +321,21 @@ def registration6(request):
 	}
 	print("the sixth step is ok")
 	return JsonResponse(data)
+
+def completeStepThree(request):
+	# Get the user object
+	client = request.user
+	print("---------look at me---------",request.user)
+	# Set Client registration step to 3
+	profile = client.profile
+	profile.registration_step = 3
+	profile.save()
+	try :
+		redirect('chat_portfolio')
+	except:
+		print("******something wrong********")
+	# Redirect to user portfolio page
+
 
 def getAccountFormByGroupAndGroupType(request, group, groupType):
 	# Get the user object
