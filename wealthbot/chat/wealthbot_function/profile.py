@@ -325,13 +325,14 @@ def registration6(request):
 def completeStepThree(request):
 	# Get the user object
 	client = request.user
-	print("---------look at me---------",request.user)
+	print("---------look at me---------",client.__dict__)
 	# Set Client registration step to 3
 	profile = client.profile
 	profile.registration_step = 3
 	profile.save()
 	try :
-		redirect('chat_portfolio')
+		redirect('rx_client_portfolio')
+		print("******True********")
 	except:
 		print("******something wrong********")
 	# Redirect to user portfolio page

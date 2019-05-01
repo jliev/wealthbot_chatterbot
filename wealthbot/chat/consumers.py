@@ -20,13 +20,16 @@ class obj(object):
 
 class ChatConsumer(WebsocketConsumer):
 
+
     def connect(self):
         self.accept()
         self.wealthbot = wealthbot_chat()
         self.scope = obj(self.scope)
 
+
     def disconnect(self, close_code):
         pass
+
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)

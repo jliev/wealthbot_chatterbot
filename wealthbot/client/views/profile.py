@@ -332,10 +332,12 @@ def updateAccountForm(request, group):
 def stepThreeBack(request):
 	return HttpResponse('Not implemented yet, please come back later!')
 
+from user.models import User
 def completeStepThree(request):
 	# Get the user object
-	client = request.user
-	print("---------look at me---------",request.user)
+#	client = request.user
+	client = User.objects.last()
+	print("---------look at me---------",client)
 	# Set Client registration step to 3
 	profile = client.profile
 	profile.registration_step = 3

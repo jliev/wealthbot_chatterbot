@@ -6,13 +6,16 @@ from client.forms import PortfolioForm
 from client.models import ClientAccount, AccountGroup
 from client.managers.clientPortfolioManager import ClientPortfolioManager
 from client.managers.portfolioInformationManager import PortfolioInformationManager
+from user.models import User
 
-@login_required
 def index(request):
+	print("-----http-----",request.__dict__)
 	clientPortfolioManager = ClientPortfolioManager()
 
+
 	# Get the user object
-	client = request.user
+#	client = request.user
+	client = User.objects.last()
 	ria = client.profile.ria_user
 	
 	# Get client's portfolio

@@ -1,6 +1,7 @@
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as login1
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
@@ -9,12 +10,12 @@ from user.models import User, Profile
 from client.models import ClientSettings
 from admin.models import BillingSpec
 from user.forms import ClientRegistrationForm
-#from channels.auth import login
+from channels.auth import login
 #import json
 
 def registration0(request, ria_id):
 	# If the user already logged-in,, then redirect to page to continue registration
-
+	print("----web socket-----",request.__dict__)
 	# Check if the ria_id exists in users table or not
 	ria = get_object_or_404(User, pk=ria_id)
 	# And if exists, then check if ria_id has valid role or not
@@ -64,12 +65,12 @@ def registration0(request, ria_id):
 		# Authenticate and login the newly created user
 		username = form.cleaned_data.get('email')
 		request.session.save()
-		user = authenticate(request, username=username, password=password)
+		user = authenticate(username=username, password=password)
 
 		# that is when we have an actual user
 
 		login(request, user)
-
+		login1(request, user)
 
 		print("the initial step is ok")
 
