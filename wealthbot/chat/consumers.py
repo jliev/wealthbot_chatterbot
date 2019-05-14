@@ -5,6 +5,7 @@ from .wealthbot_function.profile import registration1,registration2,registration
 from .wealthbot_function.profile import registration4,registration5,registration6,completeStepThree
 import json
 import re
+from client.models.Median import Email
 
 class obj(object):
     def __init__(self, d):
@@ -45,6 +46,8 @@ class ChatConsumer(WebsocketConsumer):
 
 
 class wealthbot_chat:
+    class Meta:
+        email = ''
 
     def __init__(self):
 
@@ -229,14 +232,19 @@ class wealthbot_chat:
                     self.step -= 1
 
             elif self.step == 0:
-                patterns, key = ["{M,m}y name is ","I am "], "\w+ \w+"
+                patterns, key = ["[M,m]y name is ","I am "], "\w+ \w+"
+                print(message)
                 result = extract_info(patterns, key, message)
                 self.name = result.split(' ')[1]
                 response = f"Dear {self.name},what's your email"
 
             elif self.step == 2:
-                patterns, key = ["{M,m}y email is "], "\w+@\w+.com"
+                patterns, key = ["[M,m]y email is "], "\w+@\w+.com"
                 result = extract_info(patterns, key, message)
+                self.email = result
+                email = Email(email = result)
+                email.save()
+                print("no attribute email?",self.email)
                 response = "Set your password please"
 
             elif self.step == 3:
@@ -267,24 +275,36 @@ class wealthbot_chat:
                     self.step -= 1
 
             if self.step == 2:
-                pattern = "\d+-\d+-\d+"
-                result = re.findall(pattern , message)[0]
-                response = f"Dear {self.name},what's your marital_status"
+                result1 = re.findall("\d{4}.*\d{2}", message)
+                result2 = re.findall("\d{2}.*\d{4}", message)
+                if result1:
+                    birthday = re.findall("\d{4}.*\d{2}.*\d{2}", message)[0]
+                if result2:
+                    birthday = re.findall("\d{2}.*\d{2}.*\d{4}", message)[0]
+                year = re.findall("\d{4}", birthday)[0]
+                month = re.findall("(?<!\d)\d{2}(?!\d)", birthday)[0]
+                day = re.findall("(?<!\d)\d{2}(?!\d)", birthday)[1]
+                result  = "{}-{}-{}".format(month, day, year)
+                response = f"Dear {self.name},what's your marital_status(you can just answer:Single)"
 
             if self.step == 3:
                 response = f"what's your phone_number"
 
             if self.step == 4:
-                response = f"what's your annual income"
+                result = re.findall("\d+.*\d+", message)[0]
+                response = f"what's your roughly annual income"
 
             if self.step == 5:
-                response = f"what's your income tax"
+                result = re.findall("\d+", message)[0]
+                response = f"what's your roughly income tax"
 
             if self.step == 6:
-                response = f"what's your liquid_net_worth"
+                result = re.findall("\d+", message)[0]
+                response = f"what's your roughly liquid_net_worth"
 
             if self.step == 7:
-                response = f"what's your employment type"
+                result = re.findall("\d+", message)[0]
+                response = f"what's your employment type(you can just answer:Employed)"
 
             if self.step == 8:
                 response = "\ncongratulation, you have finish the second step \n" \
@@ -356,8 +376,8 @@ class wealthbot_chat:
                     response = f"What types of accounts will we be managing for you\n" \
                                f"a.Open a new account\n" \
                                f"b.Transfer an account\n" \
-                               f"c.Rollover a 401(k) plan\n"
-
+                               f"c.Rollover a 401(k) plan\n"\
+                               f"(you can choose: a)\n"
                 else:
                     response = "please send continue to next step"
                     self.step -= 1
@@ -369,7 +389,8 @@ class wealthbot_chat:
                            f"a.Personal Investment Account\n" \
                            f"b.Joint Investment Account\n" \
                            f"c.Roth IRA\n" \
-                           f"d.Traditional IRA\n"
+                           f"d.Traditional IRA\n"\
+                           f"(you can just choose: a)\n"
 
         elif self.registration_step == 4:
             if self.step == 1:
@@ -379,11 +400,13 @@ class wealthbot_chat:
 
         elif self.registration_step == 5:
             if self.step == 0:
+                result = re.findall("\d+", message)[0]
                 response = f"Will you be making contributions or\n" \
                            f"withdrawing money from the account\n" \
                            f"a.Contributions\n" \
                            f"b.Distributions\n" \
-                           f"c.Neither\n"
+                           f"c.Neither\n"\
+                           f"(you can just choose: c)\n"
             if self.step == 1:
                 response = "send anything,then you can see the portfolio from\n"\
                            "the see my portfolio button"

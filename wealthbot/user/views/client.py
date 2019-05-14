@@ -14,10 +14,12 @@ from user.forms import ClientRegistrationForm
 def registration(request, ria_id):
 	# If the user already logged-in,, then redirect to page to continue registration
 
+	print(request.user)
 	if request.user.is_authenticated:
 		redirectUrl = redirectIfUserExist(request.user)
 		if redirectUrl is not None:
 			return redirect(redirectUrl)
+
 
 	# Check if the ria_id exists in users table or not
 	ria = get_object_or_404(User, pk=ria_id)
@@ -93,7 +95,7 @@ def registration(request, ria_id):
 	}
 	return render(request, 'user/client_registration.html', context)
 
-@login_required
+#@login_required
 def redirectIfUserExist(user):
 	# Return the redirect label from the given registration_step
 	if hasattr(user, 'profile'):

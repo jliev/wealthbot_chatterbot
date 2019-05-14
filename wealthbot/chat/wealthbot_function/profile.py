@@ -22,7 +22,7 @@ ACCOUNT_STEP_ACCOUNT_OWNER_FORM = 4
 def registration1(request):
 	# Get the user object
 	user = request.user
-	print("step1,user------",user)
+	print("step1,user------", user)
 	# Create user profile if it doesn't exist
 	if not hasattr(user, 'profile'):
 		profile = Profile(user=user, first_name='#')
@@ -330,6 +330,7 @@ def completeStepThree(request):
 	profile = client.profile
 	profile.registration_step = 3
 	profile.save()
+	Email = client.email
 	try :
 		redirect('rx_client_portfolio')
 		print("******True********")

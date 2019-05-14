@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://D:/internship/work/software/HFT-bt-framework-vnpy2.02/.idea/HFT-bt-framework-vnpy2.02.iml" filepath="D:/internship/work/software/HFT-bt-framework-vnpy2.02/.idea/HFT-bt-framework-vnpy2.02.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/django-wealthbot.iml" filepath="$PROJECT_DIR$/.idea/django-wealthbot.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/wealthbot_chatterbot.iml" filepath="$PROJECT_DIR$/.idea/wealthbot_chatterbot.iml" />
     </modules>

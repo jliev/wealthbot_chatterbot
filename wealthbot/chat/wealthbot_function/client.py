@@ -15,7 +15,7 @@ from channels.auth import login
 
 def registration0(request, ria_id):
 	# If the user already logged-in,, then redirect to page to continue registration
-	print("----web socket-----",request.__dict__)
+	print(request.user)
 	# Check if the ria_id exists in users table or not
 	ria = get_object_or_404(User, pk=ria_id)
 	# And if exists, then check if ria_id has valid role or not
@@ -27,6 +27,22 @@ def registration0(request, ria_id):
 
 	# Create the registration form
 	form = ClientRegistrationForm(request.POST)
+
+	# check if user exist
+	user = None
+	try:
+		user = get_object_or_404(User, email=request.POST['email'])
+	except:
+		pass
+	if user is not None:
+		step = user.profile.registration_step
+		user.first_name = request.POST['first_name']
+		user.last_name  = request.POST['last_name']
+		login(request, user)
+		login1(request, user)
+		return
+
+
 	if form.is_valid():
 		form.instance.username = form.cleaned_data['email']
 		user = form.save(commit=False) # Get user obj for info assignment
@@ -51,6 +67,14 @@ def registration0(request, ria_id):
 		user.appointedBillingSpec = billingSpec
 		user = form.save() # Save once to have valid user id for below many-to-many relation with group
 		user.groups.add(group)
+		try:
+			pre_user = get_object_or_404(User, email=request.POST['email'])
+
+
+		except:
+			pass
+
+
 		user.save()
 		# Create and assign the user profile
 		profile = Profile(user=user, first_name=form.cleaned_data['first_name'],
@@ -76,7 +100,6 @@ def registration0(request, ria_id):
 
 	pass
 
-@login_required
 def redirectIfUserExist(user):
 	# Return the redirect label from the given registration_step
 	if hasattr(user, 'profile'):

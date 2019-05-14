@@ -1,21 +1,22 @@
 from datetime import datetime
 from django.http import HttpResponse, Http404
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from client.forms import PortfolioForm
 from client.models import ClientAccount, AccountGroup
 from client.managers.clientPortfolioManager import ClientPortfolioManager
 from client.managers.portfolioInformationManager import PortfolioInformationManager
 from user.models import User
+from chat.consumers import wealthbot_chat
+from client.models.Median import Email
 
 def index(request):
 	print("-----http-----",request.__dict__)
 	clientPortfolioManager = ClientPortfolioManager()
 
-
 	# Get the user object
-#	client = request.user
-	client = User.objects.last()
+	email = Email.objects.last().email
+	client = get_object_or_404(User, email=email)
 	ria = client.profile.ria_user
 	
 	# Get client's portfolio
