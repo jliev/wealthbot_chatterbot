@@ -32,6 +32,7 @@ def stepOne(request):
 	if request.method == 'POST':
 		print('stepOne: ',request.POST)
 		form = ClientProfileForm(request.POST, prefix='client', instance=profile)
+		print('success')
 		subform = ClientSpouseForm(request.POST, prefix='spouse')
 		if form.is_valid():
 			# print('Form is valid')

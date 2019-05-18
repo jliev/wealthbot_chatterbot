@@ -35,13 +35,16 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        if len(re.findall("bye", message))>0:
+            self.wealthbot = wealthbot_chat()
         response, result = self.wealthbot.get_response(message)
-#        print("yayayya_________________")
-#        print(self.scope)
-#        response, result = message,message
-        self.wealthbot.recv_msg(self.scope,result)
+        special_response = self.wealthbot.recv_msg(self.scope, result)
+        if special_response is None:
+            special_response = ''
+        print(special_response)
+        print(special_response+response)
         self.send(text_data=json.dumps({
-            'message': response
+            'message': special_response+response
         }))
 
 
@@ -88,7 +91,7 @@ class wealthbot_chat:
         if self.registration_step == 0:
             if self.step <= -1:
                 self.step += 1
-                return
+                return ''
             if self.step == 0:
                 field1 = self.field0[self.step]
                 field2 = self.field0[self.step+1]
@@ -100,24 +103,23 @@ class wealthbot_chat:
                 self.post0[field] = message
                 self.step += 1
             print('--------post0-------:', self.post0)
-            # for debug
-            # self.post0[self.field0[0]] = 'Li'
-            # self.post0[self.field0[1]] = 'Jiahao'
-            # self.post0[self.field0[2]] = '115@qq.com'
-            # self.post0[self.field0[3]] = 'Adgjmptw63318798'
-            # self.post0[self.field0[4]] = 'Adgjmptw63318798'
-            # self.post0[self.field0[5]] = 'True'
             if set(self.post0.keys()) == set(self.field0): #初始表填完了
+                special_response = ''
                 request.POST = self.post0
                 # post form0
                 print("function0")
-                self.function0(request, 5)
+                self.registration_step = self.function0(request, 5)+1
                 # intialize form1
                 self.step = 1
-                self.registration_step = 1
+                if self.registration_step >1:
+                    if self.registration_step > 3:
+                        self.registration_step = 3
+                    self.step = -1
+                    special_response = f'\nDear {self.name},you are not new user'\
+                                       f'\nyou can continue the {self.registration_step} step'
                 self.post1['client-first_name'] = self.post0['first_name']
                 self.post1['client-last_name']  = self.post0['last_name']
-                return
+                return special_response
 
         #first registration step
         if self.registration_step == 1:
@@ -129,13 +131,14 @@ class wealthbot_chat:
             self.step += 1
             print('--------post1-------:', self.post1)
             if set(self.post1.keys()) == set(self.field1):  # 第一张表填完了
+                special_response = ''
                 request.POST = self.post1
                 # post form1
                 print("function1")
                 self.function1(request)
                 self.step = -1
                 self.registration_step = 2
-                return
+                return special_response
 
         #second registration step
         if self.registration_step == 2:
@@ -147,13 +150,14 @@ class wealthbot_chat:
             self.step += 1
             print('--------post2-------:', self.post2)
             if set(self.post2.keys()) == set(self.field2):  # 第二张表填完了
+                special_response = ''
                 request.POST = self.post2
                 # post form2
                 print("function2")
                 self.function2(request)
                 self.step = -1
                 self.registration_step = 3
-                return
+                return special_response
 
         #third registration step
         if self.registration_step == 3:
@@ -165,6 +169,7 @@ class wealthbot_chat:
             self.step += 1
             print('--------post3-------:', self.post3)
             if set(self.post3.keys()) == set(self.field3):  # 第三张表填完了
+                special_response = ''
                 request.POST = self.post3
                 # post form3
                 print("function3")
@@ -172,7 +177,7 @@ class wealthbot_chat:
                 self.step = 1
                 self.registration_step = 4
                 self.post4['client_account_types-groups'] = self.post3['client_account_types-groups']
-                return
+                return special_response
 
         #forth registration step
         if self.registration_step == 4:
@@ -181,13 +186,14 @@ class wealthbot_chat:
             self.step += 1
             print('--------post4-------:', self.post4)
             if set(self.post4.keys()) == set(self.field4):  # 第四张表填完了
+                special_response = ''
                 request.POST = self.post4
                 # post form4
                 print("function4")
                 self.function4(request)
                 self.step = 0
                 self.registration_step = 5
-                return
+                return special_response
 
         #fifth registration step
         if self.registration_step == 5:
@@ -196,6 +202,7 @@ class wealthbot_chat:
             self.step += 1
             print('--------post5-------:', self.post5)
             if set(self.post5.keys()) == set(self.field5):  # 第五张表填完了
+                special_response = ''
                 request.POST = self.post5
                 # post form5
                 print("function5")
@@ -203,11 +210,11 @@ class wealthbot_chat:
                 self.step = 1
                 self.registration_step = 6
                 self.post6['value'] = self.post5['value']
-                return
+                return special_response
 
         #sixth registration step
         if self.registration_step == 6:
-
+            special_response = ''
             for i in range(self.step,len(self.field6)):
                 field = self.field6[i]
                 self.post6[field] = 0
@@ -215,7 +222,7 @@ class wealthbot_chat:
             print("function6")
             self.function6(request)
             self.function7(request)
-            return
+            return special_response
 
     def get_response(self,message):
 
@@ -261,8 +268,8 @@ class wealthbot_chat:
                 patterns, key = [], "\w+"
                 result = extract_info(patterns, key, message)
                 if result == 'True':
-                    response = "\ncongratulation, you have finish the first step \n" \
-                               "if you want to continue, send continue"
+                    response = "\nif you want to continue, send continue"
+
 
 
         elif self.registration_step == 1:
@@ -291,19 +298,66 @@ class wealthbot_chat:
                 response = f"what's your phone_number"
 
             if self.step == 4:
-                result = re.findall("\d+.*\d+", message)[0]
+                results = re.findall("\d+", message)
+                if len(results)>1:
+                    p = results[0]
+                    p = p.replace('0', '')
+                    if len(p)>3:
+                        p = p[-3:]
+                    else:
+                        p = p.zfill(3)
+                    q = ''.join(results[1:])
+                    q = q[:7]
+                else:
+                    p = '111'
+                    q = q[:7]
+                result = f"({p}) {q[:3]}-{q[3:]}"
                 response = f"what's your roughly annual income"
 
             if self.step == 5:
-                result = re.findall("\d+", message)[0]
-                response = f"what's your roughly income tax"
+                result = result.replace(' ','')
+                result = result.replace(',', '')
+                result = re.findall("\d+", result)[0]
+                result = int(result)
+                if result<50000:
+                    result = "$0-$50,000"
+                elif result<75000:
+                    result = "$50,001-$75,000"
+                elif result < 100000:
+                    result = "$75,001-$100,000"
+                elif result < 150000:
+                    result = "$100,001-$150,000"
+                elif result < 250000:
+                    result = "$150,001-$250,000"
+                else:
+                    result = "$250,001 +"
+                response = f"what's your roughly income tax(percentage)"
 
             if self.step == 6:
                 result = re.findall("\d+", message)[0]
                 response = f"what's your roughly liquid_net_worth"
 
             if self.step == 7:
-                result = re.findall("\d+", message)[0]
+                result = result.replace(' ', '')
+                result = result.replace(',', '')
+                result = re.findall("\d+", result)[0]
+                result = int(result)
+                if result<25000:
+                    result = "$0-$25,000"
+                elif result<50000:
+                    result = "$25,001-$50,000"
+                elif result < 100000:
+                    result = "$50,001-$100,000"
+                elif result < 200000:
+                    result = "$100,001-$200,000"
+                elif result < 350000:
+                    result = "$200,001-$350,000"
+                elif result < 700000:
+                    result = "$350,001-$700,000"
+                elif result < 1000000:
+                    result = "$700,001-$1,000,000"
+                else:
+                    result = "$1,000,001 +"
                 response = f"what's your employment type(you can just answer:Employed)"
 
             if self.step == 8:
@@ -373,7 +427,7 @@ class wealthbot_chat:
         elif self.registration_step == 3:
             if self.step <= -1:
                 if message == "continue":
-                    response = f"What types of accounts will we be managing for you\n" \
+                    response = f"\nWhat types of accounts will we be managing for you\n" \
                                f"a.Open a new account\n" \
                                f"b.Transfer an account\n" \
                                f"c.Rollover a 401(k) plan\n"\

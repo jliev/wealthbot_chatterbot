@@ -15,8 +15,8 @@ from channels.auth import login
 
 def registration0(request, ria_id):
 	# If the user already logged-in,, then redirect to page to continue registration
-	print(request.user)
 	# Check if the ria_id exists in users table or not
+
 	ria = get_object_or_404(User, pk=ria_id)
 	# And if exists, then check if ria_id has valid role or not
 	if not ria.hasRole('ROLE_RIA'):
@@ -35,12 +35,14 @@ def registration0(request, ria_id):
 	except:
 		pass
 	if user is not None:
+
 		step = user.profile.registration_step
 		user.first_name = request.POST['first_name']
 		user.last_name  = request.POST['last_name']
 		login(request, user)
 		login1(request, user)
-		return
+		print(step)
+		return step
 
 
 	if form.is_valid():
@@ -67,18 +69,11 @@ def registration0(request, ria_id):
 		user.appointedBillingSpec = billingSpec
 		user = form.save() # Save once to have valid user id for below many-to-many relation with group
 		user.groups.add(group)
-		try:
-			pre_user = get_object_or_404(User, email=request.POST['email'])
-
-
-		except:
-			pass
-
 
 		user.save()
 		# Create and assign the user profile
 		profile = Profile(user=user, first_name=form.cleaned_data['first_name'],
-			last_name=form.cleaned_data['last_name'], registration_step=0)
+			last_name=form.cleaned_data['last_name'])
 		# Assign the RIA information
 		profile.ria_user = ria
 		profile.client_status = Profile.CLIENT_STATUS_PROSPECT
@@ -98,13 +93,6 @@ def registration0(request, ria_id):
 
 		print("the initial step is ok")
 
-	pass
 
-def redirectIfUserExist(user):
-	# Return the redirect label from the given registration_step
-	if hasattr(user, 'profile'):
-		return {
-		    1 : 'rx_client_profile_step_two',
-		    2 : 'rx_client_profile_step_three',
-		    3 : 'rx_client_finish_registration',
-		}.get(user.profile.registration_step, 'rx_client_profile_step_one')
+	return 0
+

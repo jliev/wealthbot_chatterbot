@@ -28,13 +28,16 @@ def registration1(request):
 		profile = Profile(user=user, first_name='#')
 	else:
 		profile = user.profile
-
+	print("step1,user------", user)
 	print(request.POST)
+	print("step1,user------", user)
 	# Create user profile collection form
 	form = ClientProfileForm(request.POST, prefix='client', instance=profile)
+	print("step1,user------", user)
 	subform = ClientSpouseForm(request.POST, prefix='spouse')
+	print("step1,user------", user)
 	if form.is_valid():
-		# print('Form is valid')
+		print('Form is valid')
 		profile = form.save(commit=False)
 		spouse = user.getSpouse()
 
@@ -58,15 +61,14 @@ def registration1(request):
 			# Otherwise remove the contact if any
 			user.removeAdditionalContact(spouse)
 
+		if spouse is not None:
+			spouse.save()
+		print("step1,user------", user)
 		# Set Client registration step to 1
 		# print('Set Client registration step to 1')
 		profile.registration_step = 1
-
 		profile.save()
 		user.save()
-		if spouse is not None:
-			spouse.save()
-
 		print("the first step is ok")
 	pass
 
@@ -210,6 +212,8 @@ def registration5(request):
 	client = request.user
 	print("step5,user------", client)
 	group = getAccountGroup(request.session)
+	print(request.session)
+	print("is there group",group)
 	print('updateAccountForm',request.POST)
 	form = ClientAccountForm(request.POST, user=client, group=group, validateAdditionalFields=False)
 
